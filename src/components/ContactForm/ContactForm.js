@@ -1,45 +1,51 @@
 import React, { Component } from 'react';
-// import PropTypes from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 
-class ContactForm extends Component {
-  state = {
-    id: uuidv4(),
-    name: '',
-    number: '',
-  };
+const INITIAL_STATE = {
+  id: '',
+  name: '',
+  number: '',
+};
 
-  handleInputsChange = e => {
-    const { name, value } = e.currentTarget;
+class ContactForm extends Component {
+  state = INITIAL_STATE;
+
+  handleInputsChange = ({ target }) => {
+    const { name, value } = target;
 
     this.setState({
       [name]: value,
-      id: uuidv4(),
     });
   };
 
   handleSubmit = e => {
     e.preventDefault();
 
-    this.props.onSubmit(this.state);
+    const { name, number } = this.state;
+    const { onAdd } = this.props;
 
-    this.reset();
+    const isValidatedForm = this.validatedForm();
+    if (!isValidatedForm) return;
+    onAdd({ id: uuidv4(), name, number });
+    this.resetForm();
   };
-  // handleSubmit = e => {
-  //   e.preventDefault();
 
-  //   this.props.onSubmitHandler(this.state);
+  validatedForm = () => {
+    const { name, number } = this.state;
+    const { onCheckUniqueContact } = this.props;
+    if (!name || !number) {
+      alert('Please enter name and phone number');
+      return false;
+    }
+    return onCheckUniqueContact(number);
+  };
 
-  //   this.reset();
-  // };
-
-  reset = () => {
-    this.setState({ id: '', name: '', number: '' });
+  resetForm = () => {
+    this.setState(INITIAL_STATE);
   };
 
   render() {
-    const { name } = this.state.name;
-    const { number } = this.state.number;
+    const { name, number } = this.state;
     return (
       <form onSubmit={this.handleSubmit}>
         <label>
@@ -48,18 +54,18 @@ class ContactForm extends Component {
             type="text"
             name="name"
             value={name}
-            onChange={this.handleInputsChange}
             placeholder="Enter name"
+            onChange={this.handleInputsChange}
           ></input>
         </label>
         <label>
-          Number
+          Phone number
           <input
             type="tel"
             name="number"
             value={number}
+            placeholder="Enter phone number"
             onChange={this.handleInputsChange}
-            placeholder="123-45-67"
           ></input>
         </label>
 

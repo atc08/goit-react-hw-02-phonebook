@@ -15,28 +15,28 @@ class App extends Component {
     filter: '',
   };
 
-  addContact = addedContact => {
-    console.log(addedContact);
-    // const additionalContact = {
-    //   id: uuidv4(),
-    //   name: '',
-    //   number: '',
-    // };
-
+  handleAddContact = addedContact => {
     this.setState(({ contacts }) => ({
       contacts: [addedContact, ...contacts],
     }));
-    console.log(this.state.contacts);
-    console.log(addedContact);
   };
 
-  deleteContact = contactId => {
+  handleCheckUniqueContact = number => {
+    const { contacts } = this.state;
+    const isExistContact = !!contacts.find(
+      contact => contact.number === number,
+    );
+    isExistContact && alert('You have such contact');
+    return !isExistContact;
+  };
+
+  handleDeleteContact = contactId => {
     this.setState(({ contacts }) => ({
       contacts: contacts.filter(contact => contact.id !== contactId),
     }));
   };
 
-  changeFilter = e => {
+  handleChangeFilter = e => {
     this.setState({ filter: e.currentTarget.value });
   };
 
@@ -49,22 +49,22 @@ class App extends Component {
   };
 
   render() {
-    // const { contacts, filter } = this.state;
+    const { filter } = this.state;
     const filterContacts = this.getFilteredContact();
 
     return (
       <div className="App">
         <h1>Phonebook</h1>
         <ContactForm
-          // onSubmitHandler={this.formSubmitHandler}
-          onSubmit={this.addContact}
+          onAdd={this.handleAddContact}
+          onCheckUniqueContact={this.handleCheckUniqueContact}
         />
 
         <h2>Contacts</h2>
-        <Filter filter={this.state.filter} onchangeFilter={this.changeFilter} />
+        <Filter filter={filter} onchangeFilter={this.handleChangeFilter} />
         <ContactList
           contacts={filterContacts}
-          ondeleteContact={this.deleteContact}
+          ondeleteContact={this.handleDeleteContact}
         />
       </div>
     );
